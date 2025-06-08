@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/AlexeyBMSTU/shop_backend/src/internal/http/auth"
+	"github.com/AlexeyBMSTU/shop_backend/src/middleware/verify_token"
 	"github.com/gorilla/mux"
 	"net/http"
-	"shop_backend/src/internal/http/auth"
-	"shop_backend/src/middleware/verify_token"
 )
 
 func main() {

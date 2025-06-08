@@ -1,0 +1,16 @@
+# Config for Air
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/app ./src/main"
+  bin = "./tmp/app"
+  include_ext = ["go"]
+  exclude_dir = ["tmp", "vendor"]
+
+[watch]
+  include_dir = ["src"]
+  exclude_dir = ["tmp", "vendor"]
+
+[log]
+  level = "info"

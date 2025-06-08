@@ -1,3 +1,6 @@
 # shop_backend
-Запуск: docker build -t name .
-docker run -p 10000:10000 name
+## Запуск: 
+- В дев режиме: make backend-dev
+- В прод режиме: make backend
+- Очистить все контейнеры: make clean
+- Вывести логи в консоль: make logs
