@@ -8,7 +8,7 @@ import (
 
 var db *pgx.Conn
 
-func initDB() {
+func InitializeDB() {
 	var err error
 	db, err = pgx.Connect(context.Background(), "postgres://username:password@172.20.0.2/database_name")
 

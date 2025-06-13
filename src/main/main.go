@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/AlexeyBMSTU/shop_backend/src/db/init"
 	"github.com/AlexeyBMSTU/shop_backend/src/internal/http/auth"
 	"github.com/AlexeyBMSTU/shop_backend/src/middleware/verify_token"
 	"github.com/gorilla/mux"
@@ -8,6 +9,7 @@ import (
 )
 
 func main() {
+	init.InitializeDB()
 	router := mux.NewRouter()
 	router.HandleFunc("/login", auth.LoginHandler).Methods("POST")
 	router.Handle("/protected", verify_token.VerifyToken(http.HandlerFunc(ProtectedHandler))).Methods("GET")

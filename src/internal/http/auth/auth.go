@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/json"
-	"github.com/AlexeyBMSTU/shop_backend/src/db/init"
 	"github.com/AlexeyBMSTU/shop_backend/src/models/User"
 	"github.com/AlexeyBMSTU/shop_backend/src/utils/tokenGen"
 	"log"
@@ -11,7 +10,6 @@ import (
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var user User.User
-	init.initDB()
 
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		log.Println("Error decoding request body:", err)
