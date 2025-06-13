@@ -9,19 +9,18 @@ build:
 	-docker build -t $(IMAGE_NAME) .
 
 run:
-	-docker rm -f $(CONTAINER_NAME) || true
-	-docker run -d --name $(CONTAINER_NAME) -p $(HOST_PORT):$(CONTAINER_PORT) $(IMAGE_NAME)
+	-docker-compose up -d
 
 run-dev:
-	-docker rm -f $(CONTAINER_NAME) || true
-	-docker run -d --name $(CONTAINER_NAME) -p $(HOST_PORT):$(CONTAINER_PORT) -v $(shell pwd):/app $(IMAGE_NAME)
+	-docker-compose up -d --build
 
 backend-dev: build run-dev
 
 backend: build run
 
 clean:
-	-docker rm -f $(CONTAINER_NAME) || true
+	-docker-compose down
 	-docker rmi $(IMAGE_NAME) || true
+
 logs:
-	-docker logs -f $(CONTAINER_NAME)
+	-docker-compose logs -f

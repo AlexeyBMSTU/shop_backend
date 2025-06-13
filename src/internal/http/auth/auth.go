@@ -2,11 +2,10 @@ package auth
 
 import (
 	"encoding/json"
-	"log"
-	"net/http"
-
 	"github.com/AlexeyBMSTU/shop_backend/src/models/User"
 	"github.com/AlexeyBMSTU/shop_backend/src/utils/tokenGen"
+	"log"
+	"net/http"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
