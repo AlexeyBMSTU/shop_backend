@@ -8,8 +8,7 @@ import (
 
 var db *pgx.Conn
 
-func init() {
-	log.Println("Pre-Creating users table...")
+func initDB() {
 	var err error
 	db, err = pgx.Connect(context.Background(), "postgres://username:password@172.20.0.2/database_name")
 
