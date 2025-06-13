@@ -1,7 +1,9 @@
-package init
+package db
 
 import (
 	"context"
+	"errors"
+	"github.com/AlexeyBMSTU/shop_backend/src/models/User"
 	"github.com/jackc/pgx/v4"
 	"log"
 )
@@ -43,4 +45,44 @@ func createTables() error {
 
 	log.Println("Users table created successfully.")
 	return nil
+}
+
+func AddUser(name string, email string) error {
+	// SQL-запрос для вставки нового пользователя
+	insertUserQuery := `
+	INSERT INTO users (name, email) 
+	VALUES ($1, $2)
+	RETURNING id;
+	`
+	var userID int
+	err := db.QueryRow(context.Background(), insertUserQuery, name, email).Scan(&userID)
+	if err != nil {
+		return err
+	}
+	log.Printf("User  added successfully with ID: %d\n", userID)
+	return nil
+}
+
+func GetUserByName(name string) (User.User, error) {
+	var user User.User
+	query := `
+	SELECT id, name, email
+	FROM users
+	WHERE name = $1;
+	`
+	row := db.QueryRow(context.Background(), query, name)
+	var id uint64
+	var email string
+	var username string
+	err := row.Scan(&id, &username, &email)
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			return user, err
+		}
+		return user, err
+	}
+	user.ID = id
+	user.Username = username
+	user.Email = email
+	return user, nil
 }

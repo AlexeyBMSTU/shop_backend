@@ -18,7 +18,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
       PGADMIN_DEFAULT_PASSWORD: password
     ports:
-      - "10001:10001"
+      - "10001:80"
     depends_on:
       - db
 
