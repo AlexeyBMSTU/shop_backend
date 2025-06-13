@@ -1,8 +1,10 @@
 package User
 
+import "github.com/google/uuid"
+
 type User struct {
-	ID       uint64 `gorm:"primaryKey" json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
+	ID       uuid.UUID `gorm:"primaryKey" json:"user_uid"`
+	Username string    `json:"username"`
+	Password string    `json:"password"`
+	Email    string    `json:"email"`
 }

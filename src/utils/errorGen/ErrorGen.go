@@ -10,10 +10,8 @@ import (
 func ErrorGen(w *http.ResponseWriter, message string, code int) {
 	var err Error.Error
 	err.Message = message
-	log.Println("ИДИСЮДА:", err)
-	//w.WriteHeader(code)
+	(*w).WriteHeader(code)
 
-	// Затем кодируем и отправляем JSON с сообщением об ошибке
 	if encodeErr := json.NewEncoder(*w).Encode(err); encodeErr != nil {
 		log.Println("Error encoding JSON:", encodeErr)
 		http.Error(*w, "Internal Server Error", http.StatusInternalServerError)

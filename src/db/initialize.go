@@ -3,7 +3,9 @@ package db
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/AlexeyBMSTU/shop_backend/src/models/User"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 	"log"
 )
@@ -17,56 +19,59 @@ func InitializeDB() {
 	if err != nil {
 		log.Fatal("Unable to connect to database:", err)
 	}
-	// Создаем таблицы
-	err = createTables()
+
+	err = createTables("users", createTableQueryUser)
 	if err != nil {
 		log.Fatal("Error creating tables:", err)
 	}
 }
 
-// createTables создает необходимые таблицы в базе данных
+func createTables(tableName string, query string) error {
+	createTableQuery := query
 
-func createTables() error {
-	// SQL-запрос для создания таблицы users
-	createUsersTable := `
-	CREATE TABLE IF NOT EXISTS users (
-		id SERIAL PRIMARY KEY,
-		name VARCHAR(100) NOT NULL,
-		email VARCHAR(100) UNIQUE NOT NULL
-	);
-	`
-
-	log.Println("Creating users table...")
-	// Выполняем запрос
-	_, err := db.Exec(context.Background(), createUsersTable)
+	log.Printf("Creating table %s...", tableName)
+	_, err := db.Exec(context.Background(), createTableQuery)
 	if err != nil {
+		log.Println("Error executing create table query:", err)
 		return err
 	}
 
-	log.Println("Users table created successfully.")
+	var exists bool
+	checkTableQuery := fmt.Sprintf("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%s');", tableName)
+	err = db.QueryRow(context.Background(), checkTableQuery).Scan(&exists)
+	if err != nil {
+		log.Println("Error checking if table exists:", err)
+		return err
+	}
+
+	if exists {
+		log.Printf("Table %s already exists.", tableName)
+	} else {
+		log.Printf("Table %s created successfully.", tableName)
+	}
+
 	return nil
 }
 
-func AddUser(name string, email string) error {
-	// SQL-запрос для вставки нового пользователя
+func AddUser(user User.User) error {
 	insertUserQuery := `
-	INSERT INTO users (name, email) 
-	VALUES ($1, $2)
+	INSERT INTO users (user_uid, name, password, email) 
+	VALUES ($1, $2, $3, $4)
 	RETURNING id;
 	`
 	var userID int
-	err := db.QueryRow(context.Background(), insertUserQuery, name, email).Scan(&userID)
+	err := db.QueryRow(context.Background(), insertUserQuery, user.ID, user.Username, user.Password, user.Email).Scan(&userID)
 	if err != nil {
 		return err
 	}
-	log.Printf("User  added successfully with ID: %d\n", userID)
+	log.Printf("user  added successfully with ID: %d\n", userID)
 	return nil
 }
 
 func GetUserByName(name string) (User.User, error) {
 	var user User.User
 	query := `
-	SELECT id, name, email
+	SELECT id, user_uid, name, password, email
 	FROM users
 	WHERE name = $1;
 	`
@@ -74,15 +79,19 @@ func GetUserByName(name string) (User.User, error) {
 	var id uint64
 	var email string
 	var username string
-	err := row.Scan(&id, &username, &email)
+	var userUID uuid.UUID
+	var password string
+	err := row.Scan(&id, &userUID, &username, &password, &email)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			return user, err
 		}
 		return user, err
 	}
-	user.ID = id
+
+	user.ID = userUID
 	user.Username = username
 	user.Email = email
+	user.Password = password
 	return user, nil
 }

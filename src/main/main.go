@@ -2,8 +2,7 @@ package main
 
 import (
 	"github.com/AlexeyBMSTU/shop_backend/src/db"
-	"github.com/AlexeyBMSTU/shop_backend/src/internal/http/auth"
-	"github.com/AlexeyBMSTU/shop_backend/src/middleware/verify_token"
+	http_routes "github.com/AlexeyBMSTU/shop_backend/src/internal/http"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -11,13 +10,11 @@ import (
 func main() {
 	db.InitializeDB()
 	router := mux.NewRouter()
-	router.HandleFunc("/login", auth.LoginHandler).Methods("POST")
-	router.HandleFunc("/registration", auth.RegisterHandler).Methods("POST")
-	router.Handle("/protected", verify_token.VerifyToken(http.HandlerFunc(ProtectedHandler))).Methods("GET")
+	routes := http_routes.GetRoutes()
+
+	for path, route := range routes {
+		router.Handle(path, route.Handler).Methods(route.Method)
+	}
 
 	http.ListenAndServe(":10000", router)
-}
-
-func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Welcome to the protected area!"))
 }
