@@ -56,9 +56,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := db.AddUser(user.Username, user.Email)
+
 	if err != nil {
-		log.Println("Error adding user to database:", err)
-		errorGen.ErrorGen(w, "could registration", http.StatusBadRequest)
+		//log.Println("Error adding user to database2322:", err)
+		errorGen.ErrorGen(&w, "could registration", http.StatusBadRequest)
 	}
 
 	token, err := tokenGen.CreateToken(user.Username)
