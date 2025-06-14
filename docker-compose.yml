@@ -31,3 +31,15 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
+        
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: shop_backend_test
+    container_name: shop_backend_test_container
+    command: [ "go", "test", "./..." ]
+    volumes:
+      - .:/app
+    depends_on:
+      - db

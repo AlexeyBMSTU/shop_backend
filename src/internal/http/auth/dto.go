@@ -7,16 +7,16 @@ import (
 )
 
 type AuthResponse struct {
-	ID       string `json:"user_uid"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	ID    string  `json:"user_uid"`
+	Name  string  `json:"name"`
+	Email *string `json:"email,omitempty"`
 }
 
 func toDTO(w *http.ResponseWriter, user User.User) {
 	var a AuthResponse
 
 	a.Email = user.Email
-	a.Username = user.Username
+	a.Name = user.Name
 	a.ID = user.ID.String()
 
 	json.NewEncoder(*w).Encode(a)

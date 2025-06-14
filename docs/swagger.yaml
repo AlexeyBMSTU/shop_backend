@@ -1,0 +1,124 @@
+openapi: 3.0.1
+info:
+  title: Shop API
+  version: 1.0.0
+  description: API для работы с проектом
+servers:
+  - url: https://localhost:10000/
+tags:
+  - name: Пользователи
+    description: Методы работы с пользователями
+
+.common_errors: &.common_errors
+  '400':
+    description: Ошибка валидации запроса
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Произошла ошибка, обратитесь в техническую поддержку
+  '401':
+    description: Неверный токен доступа
+  '404':
+    description: Объект не найден
+  '500':
+    description: Внутренняя ошибка сервера
+
+paths:
+  /api/v1/login/:
+    post:
+      tags:
+        - Пользователи
+      summary: Аутентификация пользователя
+      description: Авторизирует пользователя
+      operationId: authUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@mail.ru
+                password:
+                  type: string
+                  example: 123a123a123
+                name:
+                  type: string
+                  example: mashonka
+              required:
+                - name
+                - password
+      responses:
+        '200':
+          description: Пользователь успешно авторизовался
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        <<: *.common_errors
+  /api/v1/registration/:
+    post:
+      tags:
+        - Пользователи
+      summary: Регистрация пользователя
+      description: Регистрирует пользователя
+      operationId: authUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@mail.ru
+                password:
+                  type: string
+                  example: 123a123a123
+                name:
+                  type: string
+                  example: mashonka
+              required:
+                - name
+                - password
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрировался
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        <<: *.common_errors
+components:
+  securitySchemes:
+    AccessToken:
+      type: apiKey
+      in: header
+      name: X-Access-Token
+  schemas:
+    user:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@mail.ru
+        password:
+          type: string
+          example: 123a123a123
+        name:
+          type: string
+          example: mashonka
+      required:
+        - email
+        - name
+        - password

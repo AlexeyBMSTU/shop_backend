@@ -8,10 +8,10 @@ import (
 )
 
 func ValidatingUser(user User.User) error {
-	if !IsValidUsername(user.Username) {
+	if !IsValidUsername(user.Name) {
 		return errors.New("username must contain at least 3;6 characters")
 	}
-	if !IsValidEmail(user.Email) {
+	if user.Email != nil && !IsValidEmail(user.Email) {
 		return errors.New("email address is invalid")
 	}
 	if !IsValidPassword(user.Password) {
@@ -26,8 +26,8 @@ func IsValidUsername(username string) bool {
 	}
 	return regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString(username)
 }
-func IsValidEmail(email string) bool {
-	return regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`).MatchString(email)
+func IsValidEmail(email *string) bool {
+	return regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`).MatchString(*email)
 }
 func IsValidPassword(password string) bool {
 	if len(password) < 8 {

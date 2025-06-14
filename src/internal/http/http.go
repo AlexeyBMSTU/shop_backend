@@ -13,15 +13,15 @@ type Route struct {
 
 func GetRoutes() map[string]Route {
 	return map[string]Route{
-		"/login": {
+		"/api/v1/login/": {
 			Handler: http.HandlerFunc(auth.LoginHandler),
 			Method:  "POST",
 		},
-		"/registration": {
+		"/api/v1/registration/": {
 			Handler: http.HandlerFunc(auth.RegisterHandler),
 			Method:  "POST",
 		},
-		"/protected": {
+		"/api/v1/protected/": {
 			Handler: verify_token.VerifyToken(http.HandlerFunc(ProtectedHandler)),
 			Method:  "GET",
 		},

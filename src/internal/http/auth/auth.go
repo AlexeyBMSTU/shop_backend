@@ -2,7 +2,7 @@ package auth
 
 import (
 	"encoding/json"
-	"github.com/AlexeyBMSTU/shop_backend/src/db"
+	user_db "github.com/AlexeyBMSTU/shop_backend/src/db/user"
 	"github.com/AlexeyBMSTU/shop_backend/src/models/User"
 	"github.com/AlexeyBMSTU/shop_backend/src/utils/errorGen"
 	"github.com/AlexeyBMSTU/shop_backend/src/utils/tokenGen"
@@ -36,31 +36,31 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("login attempt for user: %s\n", user.Username)
+	log.Printf("login attempt for user: %s\n", user.Name)
 
-	if user.Username == "" || user.Email == "" || user.Password == "" {
-		errorGen.ErrorGen(&w, "username, email, and password are required", http.StatusBadRequest)
+	if user.Name == "" || user.Password == "" {
+		errorGen.ErrorGen(&w, "name and password are required", http.StatusBadRequest)
 		return
 	}
 
-	dbUser, err := db.GetUserByName(user.Username)
+	dbUser, err := user_db.GetUserByName(user.Name)
 	if err != nil {
 		errorGen.ErrorGen(&w, "user not found", http.StatusBadRequest)
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password)); err != nil {
-		log.Println("invalid password for user:", user.Username)
+		log.Println("invalid password for user:", user.Name)
 		errorGen.ErrorGen(&w, "invalid password", http.StatusUnauthorized)
 		return
 	}
 
-	if dbUser.Email != user.Email {
+	if user.Email != nil && user.Email != dbUser.Email {
 		errorGen.ErrorGen(&w, "invalid email", http.StatusUnauthorized)
 		return
 	}
 
-	token, err := tokenGen.CreateToken(dbUser.Username)
+	token, err := tokenGen.CreateToken(dbUser.Name)
 	if err != nil {
 		log.Println("could not create token:", err)
 		http.Error(w, "could not create token", http.StatusInternalServerError)
@@ -71,7 +71,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	toDTO(&w, dbUser)
 
-	log.Printf("user logged in: %s\n", dbUser.Username)
+	log.Printf("user logged in: %s\n", dbUser.Name)
+	return
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
@@ -83,10 +84,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("registration attempt for user: %s\n", user.Username)
+	log.Printf("registration attempt for user2: %s\n", user.Name)
 
-	if user.Username == "" || user.Email == "" || user.Password == "" {
-		errorGen.ErrorGen(&w, "username, email, and password are required", http.StatusBadRequest)
+	if user.Name == "" || user.Password == "" {
+		errorGen.ErrorGen(&w, "username and password are required", http.StatusBadRequest)
 		return
 	}
 
@@ -107,14 +108,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	user.Password = string(hashedPassword)
 
-	err = db.AddUser(user)
+	err = user_db.AddUser(user)
 	if err != nil {
 		log.Println("error registration:", err)
 		errorGen.ErrorGen(&w, "user already exists", http.StatusBadRequest)
 		return
 	}
 
-	token, err := tokenGen.CreateToken(user.Username)
+	token, err := tokenGen.CreateToken(user.Name)
 	if err != nil {
 		log.Println("could not create token:", err)
 		errorGen.ErrorGen(&w, "could not create token", http.StatusInternalServerError)
@@ -124,5 +125,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	setCookie(w, token)
 	w.WriteHeader(http.StatusCreated)
 	toDTO(&w, user)
-	log.Printf("user  registered successfully: %s\n", user.Username)
+
+	log.Printf("user  registered successfully: %s\n", user.Name)
+	return
 }

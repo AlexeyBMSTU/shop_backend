@@ -14,6 +14,9 @@ run:
 run-dev:
 	-docker-compose up -d --build
 
+test:
+	docker-compose run test
+
 backend-dev: build run-dev
 
 backend: build run
