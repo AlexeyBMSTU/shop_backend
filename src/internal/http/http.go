@@ -2,7 +2,6 @@ package http_routes
 
 import (
 	"github.com/AlexeyBMSTU/shop_backend/src/internal/http/auth"
-	"github.com/AlexeyBMSTU/shop_backend/src/middleware/verify_token"
 	"net/http"
 )
 
@@ -13,21 +12,21 @@ type Route struct {
 
 func GetRoutes() map[string]Route {
 	return map[string]Route{
-		"/api/v1/login/": {
+		"/api/v1/auth/login/": {
 			Handler: http.HandlerFunc(auth.LoginHandler),
 			Method:  "POST",
 		},
-		"/api/v1/registration/": {
+		"/api/v1/auth/registration/": {
 			Handler: http.HandlerFunc(auth.RegisterHandler),
 			Method:  "POST",
 		},
-		"/api/v1/protected/": {
-			Handler: verify_token.VerifyToken(http.HandlerFunc(ProtectedHandler)),
+		"/api/v1/auth/logout/": {
+			Handler: http.HandlerFunc(auth.LogoutHandler),
+			Method:  "POST",
+		},
+		"/api/v1/auth/me/": {
+			Handler: http.HandlerFunc(auth.MeHandler),
 			Method:  "GET",
 		},
 	}
-}
-
-func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Welcome322 to the protected area"))
 }

@@ -35,6 +35,7 @@ func GetUserByName(name string) (User.User, error) {
 
 	row := db.Database.QueryRow(context.Background(), query, name)
 
+	log.Printf("login 1.3 attempt for user: %s\n", user.Name)
 	var id uint64
 	var email *string
 	var username string
@@ -48,11 +49,13 @@ func GetUserByName(name string) (User.User, error) {
 		}
 		return user, err
 	}
-
+	log.Printf("login 1.4 attempt for user: %s\n", user.Name)
 	user.ID = userUID
 	user.Name = username
 	user.Password = password
-	user.Email = email
+	if email != nil {
+		user.Email = email
+	}
 
 	return user, nil
 }

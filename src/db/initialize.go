@@ -5,16 +5,21 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v4"
 	"log"
+	"os"
 )
 
 func InitializeDB() {
 	var err error
-	Database, err = pgx.Connect(context.Background(), "postgres://username:password@172.20.0.2/database_name")
 
+	username := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	databaseName := os.Getenv("POSTGRES_DB")
+
+	databaseURL := fmt.Sprintf("postgres://%s:%s@db:5432/%s", username, password, databaseName)
+	Database, err = pgx.Connect(context.Background(), databaseURL)
 	if err != nil {
 		log.Fatal("Unable to connect to database:", err)
 	}
-
 	err = createTables("users", createTableQueryUser)
 	if err != nil {
 		log.Fatal("Error creating tables:", err)

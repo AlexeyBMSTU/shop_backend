@@ -6,8 +6,8 @@ info:
 servers:
   - url: https://localhost:10000/
 tags:
-  - name: Пользователи
-    description: Методы работы с пользователями
+  - name: Аутентификация
+    description: Методы работы с аутентификацией
 
 .common_errors: &.common_errors
   '400':
@@ -28,7 +28,7 @@ tags:
     description: Внутренняя ошибка сервера
 
 paths:
-  /api/v1/login/:
+  /api/v1/auth/login/:
     post:
       tags:
         - Пользователи
@@ -40,30 +40,16 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                  example: user@mail.ru
-                password:
-                  type: string
-                  example: 123a123a123
-                name:
-                  type: string
-                  example: mashonka
-              required:
-                - name
-                - password
+              $ref: '#/components/schemas/userRequest'
       responses:
         '200':
           description: Пользователь успешно авторизовался
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user'
+                $ref: '#/components/schemas/userResponse'
         <<: *.common_errors
-  /api/v1/registration/:
+  /api/v1/auth/registration/:
     post:
       tags:
         - Пользователи
@@ -75,28 +61,29 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                  example: user@mail.ru
-                password:
-                  type: string
-                  example: 123a123a123
-                name:
-                  type: string
-                  example: mashonka
-              required:
-                - name
-                - password
+              $ref: '#/components/schemas/userRequest'
       responses:
         '200':
           description: Пользователь успешно зарегистрировался
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user'
+                $ref: '#/components/schemas/userResponse'
+        <<: *.common_errors
+  /api/v1/auth/me/:
+    get:
+      tags:
+        - Пользователи
+      summary: Проверка на аутентификацию
+      description: Проверяет аутентификацию
+      operationId: authUser
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрировался
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userResponse'
         <<: *.common_errors
 components:
   securitySchemes:
@@ -105,7 +92,22 @@ components:
       in: header
       name: X-Access-Token
   schemas:
-    user:
+    userResponse:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@mail.ru
+        user_uid:
+          type: string
+        name:
+          type: string
+          example: mashonka
+      required:
+        - name
+        - user_uid
+    userRequest:
       type: object
       properties:
         email:
@@ -119,6 +121,18 @@ components:
           type: string
           example: mashonka
       required:
-        - email
+        - name
+        - password
+    protected:
+      type: object
+      properties:
+        message:
+          type: string
+          format: email
+          example: user@mail.ru
+        name:
+          type: string
+          example: mashonka
+      required:
         - name
         - password
