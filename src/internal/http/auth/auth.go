@@ -128,11 +128,21 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookieValue, _ := cookie.GetCookie(r)
+	cookieValue, err := cookie.GetCookie(r)
+	if err != nil {
+		log.Println("error getting cookie:", err)
+		errorGen.ErrorGen(&w, "cookie not found", http.StatusUnauthorized)
+		return
+	}
 
-	username, _ := tokenGen.ExtractUsernameFromToken(cookieValue)
+	username, err := tokenGen.ExtractUsernameFromToken(cookieValue)
+	if err != nil {
+		log.Println("error extracting username from token:", err)
+		errorGen.ErrorGen(&w, "invalid token", http.StatusUnauthorized)
+		return
+	}
 
-	cookie.ClearCookie(w, cookieValue)
+	cookie.ClearCookie(w)
 
 	w.WriteHeader(http.StatusOK)
 
