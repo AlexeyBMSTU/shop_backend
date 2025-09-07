@@ -2,6 +2,7 @@ package http_routes
 
 import (
 	"github.com/AlexeyBMSTU/shop_backend/src/internal/http/auth"
+	"github.com/AlexeyBMSTU/shop_backend/src/internal/http/profile"
 	"net/http"
 )
 
@@ -27,6 +28,14 @@ func GetRoutes() map[string]Route {
 		"/api/v1/auth/me/": {
 			Handler: http.HandlerFunc(auth.MeHandler),
 			Method:  "GET",
+		},
+		"/api/v1/profile/update/": {
+			Handler: http.HandlerFunc(profile.UpdateProfile),
+			Method:  "PUT",
+		},
+		"/api/v1/profile/delete/": {
+			Handler: http.HandlerFunc(profile.DeleteProfile),
+			Method:  "DELETE",
 		},
 	}
 }

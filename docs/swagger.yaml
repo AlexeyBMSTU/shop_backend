@@ -8,6 +8,8 @@ servers:
 tags:
   - name: Аутентификация
     description: Методы работы с аутентификацией
+  - name: Профиль
+    description: Методы работы с профилем
 
 .common_errors: &.common_errors
   '400':
@@ -85,6 +87,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/userResponse'
         <<: *.common_errors
+  /api/v1/profile/update/:
+    put:
+      tags:
+        - Профиль
+      summary: Обновление профиля
+      description: Обновляет профиль
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/profileUpdate'
+      responses:
+        '200':
+          description: Пользователь успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/profileUpdate'
+  /api/v1/profile/delete/:
+    delete:
+      tags:
+        - Профиль
+      summary: Удаление профиля
+      description: Удаляет профиль
+      operationId: deleteProfile
+      responses:
+        '200':
+          description: Пользователь успешно удален
+        <<: *.common_errors
 components:
   securitySchemes:
     AccessToken:
@@ -103,7 +136,7 @@ components:
           type: string
         name:
           type: string
-          example: mashonka
+          example: name
       required:
         - name
         - user_uid
@@ -119,7 +152,7 @@ components:
           example: 123a123a123
         name:
           type: string
-          example: mashonka
+          example: name
       required:
         - name
         - password
@@ -132,7 +165,20 @@ components:
           example: user@mail.ru
         name:
           type: string
-          example: mashonka
+          example: name
       required:
         - name
         - password
+    profileUpdate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@mail.ru
+        name:
+          type: string
+          example: name
+        password:
+          type: string
+          example: password

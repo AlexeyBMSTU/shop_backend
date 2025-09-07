@@ -50,7 +50,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	token, err := tokenGen.CreateToken(dbUser.Name)
+	token, err := tokenGen.CreateToken(dbUser.Name, dbUser.ID)
 	if err != nil {
 		log.Println("could not create token:", err)
 		http.Error(w, "could not create token", http.StatusInternalServerError)
@@ -84,7 +84,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	err := validate.ValidatingUser(user)
 	if err != nil {
 		log.Println("error reg:", err)
-		errorGen.ErrorGen(&w, "invalid credentials", http.StatusBadRequest)
+		errorGen.ErrorGen(&w, "bad request", http.StatusBadRequest)
 		return
 	}
 	user.ID = uuid.New()
@@ -105,7 +105,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := tokenGen.CreateToken(user.Name)
+	token, err := tokenGen.CreateToken(user.Name, user.ID)
 	if err != nil {
 		log.Println("could not create token:", err)
 		errorGen.ErrorGen(&w, "could not create token", http.StatusInternalServerError)
@@ -124,7 +124,6 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := verify_token.VerifyToken(w, r)
 	if err != nil {
 		log.Println("error verifying token:", err)
-		errorGen.ErrorGen(&w, "invalid token", http.StatusUnauthorized)
 		return
 	}
 
@@ -152,7 +151,6 @@ func MeHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := verify_token.VerifyToken(w, r)
 	if err != nil {
 		log.Println("error verifying token:", err)
-		errorGen.ErrorGen(&w, "invalid token", http.StatusUnauthorized)
 		return
 	}
 	cookieValue, _ := r.Cookie("X-Access-Token")
